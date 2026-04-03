@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import { requireUser } from "@/lib/requireUser"
@@ -126,7 +126,7 @@ function extractModeAndText(rawReading: string) {
   return { mode, text }
 }
 
-export default function ReadingPage() {
+function ReadingPageContent() {
   const searchParams = useSearchParams()
   const historyId = searchParams.get("id")
   const selectedModeFromUrl = searchParams.get("mode") || "general"
@@ -446,5 +446,23 @@ export default function ReadingPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+function ReadingPageFallback() {
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-[#120a24] via-[#24124d] to-[#12345f] text-white flex items-center justify-center px-6">
+      <div className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl px-8 py-6 text-lg shadow-2xl">
+        Loading...
+      </div>
+    </main>
+  )
+}
+
+export default function ReadingPage() {
+  return (
+    <Suspense fallback={<ReadingPageFallback />}>
+      <ReadingPageContent />
+    </Suspense>
   )
 }
